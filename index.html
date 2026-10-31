@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#10131c">
+    <title>Simple Calculator</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #10131c;
+        color: #f5f6fb;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(ellipse at 50% 0%, #272c42 0%, transparent 58%),
+          #10131c;
+      }
+
+      .calculator {
+        width: min(100%, 360px);
+        padding: 24px;
+        border: 1px solid #303548;
+        border-radius: 28px;
+        background: #191d29;
+        box-shadow: 0 24px 70px #0006;
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        color: #aab1c5;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .display {
+        min-height: 96px;
+        display: flex;
+        align-items: end;
+        justify-content: end;
+        overflow: hidden;
+        margin-bottom: 20px;
+        padding: 12px 4px;
+        color: #fff;
+        font-size: clamp(2.5rem, 12vw, 3.5rem);
+        font-variant-numeric: tabular-nums;
+        font-weight: 300;
+        white-space: nowrap;
+      }
+
+      .keys {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      button {
+        min-height: 64px;
+        border: 0;
+        border-radius: 18px;
+        background: #292e3d;
+        color: #f5f6fb;
+        cursor: pointer;
+        font: inherit;
+        font-size: 1.25rem;
+        transition: background 120ms ease, transform 120ms ease;
+        touch-action: manipulation;
+      }
+
+      button:hover { background: #363c4e; }
+      button:active { transform: scale(0.96); }
+      button:focus-visible { outline: 2px solid #a99bff; outline-offset: 3px; }
+      button.utility { background: #34394a; color: #c5cada; }
+      button.operator { background: #34304d; color: #c0b5ff; }
+      button.operator[aria-pressed="true"] { background: #7562d9; color: #fff; }
+      button.equals { background: #8d78f5; color: #fff; }
+      button.zero { grid-column: span 2; }
+
+      @media (max-width: 380px) {
+        .calculator { padding: 18px; }
+        button { min-height: 58px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="calculator" aria-label="Calculator">
+      <h1>Calculator</h1>
+      <output class="display" id="display" aria-live="polite" aria-atomic="true">0</output>
+      <div class="keys">
+        <button class="utility" type="button" data-action="clear" aria-label="Clear">AC</button>
+        <button class="utility" type="button" data-action="delete" aria-label="Delete last digit">DEL</button>
+        <button class="utility" type="button" data-action="sign" aria-label="Change sign">±</button>
+        <button class="operator" type="button" data-operator="/" aria-label="Divide">÷</button>
+
+        <button type="button" data-digit="7">7</button>
+        <button type="button" data-digit="8">8</button>
+        <button type="button" data-digit="9">9</button>
+        <button class="operator" type="button" data-operator="*" aria-label="Multiply">×</button>
+
+        <button type="button" data-digit="4">4</button>
+        <button type="button" data-digit="5">5</button>
+        <button type="button" data-digit="6">6</button>
+        <button class="operator" type="button" data-operator="-" aria-label="Subtract">−</button>
+
+        <button type="button" data-digit="1">1</button>
+        <button type="button" data-digit="2">2</button>
+        <button type="button" data-digit="3">3</button>
+        <button class="operator" type="button" data-operator="+" aria-label="Add">+</button>
+
+        <button class="zero" type="button" data-digit="0">0</button>
+        <button type="button" data-digit=".">.</button>
+        <button class="equals" type="button" data-action="equals" aria-label="Equals">=</button>
+      </div>
+    </main>
+    <script type="module" src="./src/app.mjs"></script>
+  </body>
+</html>
