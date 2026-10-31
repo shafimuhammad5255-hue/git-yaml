@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { calculate, formatResult } from "../src/calculator.mjs";
+import { calculate, formatResult, percentage, squareRoot } from "../src/calculator.mjs";
 
 test("adds positive and negative numbers", () => {
   assert.equal(calculate(12, "+", 8), 20);
@@ -17,6 +17,28 @@ test("multiplies numbers", () => {
 
 test("divides numbers", () => {
   assert.equal(calculate(20, "/", 4), 5);
+});
+
+test("converts values to percentages", () => {
+  assert.equal(percentage(25), 0.25);
+  assert.equal(percentage(-50), -0.5);
+});
+
+test("calculates square roots", () => {
+  assert.equal(squareRoot(81), 9);
+  assert.equal(squareRoot(0), 0);
+});
+
+test("rejects square roots of negative numbers", () => {
+  assert.throws(() => squareRoot(-1), {
+    name: "RangeError",
+    message: "Cannot calculate the square root of a negative number",
+  });
+});
+
+test("rejects non-finite unary operation inputs", () => {
+  assert.throws(() => percentage(Infinity), TypeError);
+  assert.throws(() => squareRoot(NaN), TypeError);
 });
 
 test("rejects division by zero", () => {
