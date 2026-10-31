@@ -27,7 +27,7 @@
       }
 
       .calculator {
-        width: min(100%, 360px);
+        width: min(100%, 400px);
         padding: 24px;
         border: 1px solid #303548;
         border-radius: 28px;
@@ -60,6 +60,40 @@
         white-space: nowrap;
       }
 
+      .display-expression {
+        min-height: 24px;
+        overflow: hidden;
+        color: #a99bff;
+        font-size: 0.95rem;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .display-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 34px;
+      }
+
+      .copy-result {
+        min-height: 30px;
+        padding: 5px 10px;
+        border-radius: 10px;
+        background: #34394a;
+        color: #c5cada;
+        font-size: 0.8rem;
+      }
+
+      .copy-status {
+        color: #aab1c5;
+        font-size: 0.75rem;
+        text-align: right;
+      }
+
       .keys {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -87,6 +121,68 @@
       button.operator[aria-pressed="true"] { background: #7562d9; color: #fff; }
       button.equals { background: #8d78f5; color: #fff; }
       button.zero { grid-column: span 2; }
+      button.unary { background: #34394a; color: #c5cada; }
+      button.clear-entry { grid-column: span 2; }
+
+      .history {
+        margin-top: 24px;
+        border-top: 1px solid #303548;
+        padding-top: 16px;
+      }
+
+      .history-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .history h2 {
+        margin: 0;
+        color: #aab1c5;
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .clear-history {
+        min-height: auto;
+        padding: 6px 10px;
+        border-radius: 10px;
+        background: transparent;
+        color: #aab1c5;
+        font-size: 0.8rem;
+      }
+
+      .history-list {
+        display: grid;
+        gap: 4px;
+        max-height: 150px;
+        overflow-y: auto;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .history-entry {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: transparent;
+        color: #d3d7e3;
+        font-size: 0.9rem;
+        text-align: right;
+      }
+
+      .history-entry:hover { background: #292e3d; }
+
+      .history-empty {
+        padding: 8px 0;
+        color: #7f879b;
+        font-size: 0.85rem;
+        text-align: center;
+      }
 
       @media (max-width: 380px) {
         .calculator { padding: 18px; }
@@ -97,6 +193,11 @@
   <body>
     <main class="calculator" aria-label="Calculator">
       <h1>Calculator</h1>
+      <div class="display-actions">
+        <output class="display-expression" id="expression" aria-live="polite" aria-label="Current expression"></output>
+        <button class="copy-result" id="copy-result" type="button">Copy result</button>
+      </div>
+      <div class="copy-status" id="copy-status" role="status" aria-live="polite"></div>
       <output class="display" id="display" aria-live="polite" aria-atomic="true">0</output>
       <div class="keys">
         <button class="utility" type="button" data-action="clear" aria-label="Clear">AC</button>
@@ -119,10 +220,20 @@
         <button type="button" data-digit="3">3</button>
         <button class="operator" type="button" data-operator="+" aria-label="Add">+</button>
 
+        <button class="unary" type="button" data-action="sqrt" aria-label="Square root">√x</button>
+        <button class="unary" type="button" data-action="percent" aria-label="Percentage">%</button>
+        <button class="utility clear-entry" type="button" data-action="clear-entry" aria-label="Clear entry">CE</button>
         <button class="zero" type="button" data-digit="0">0</button>
         <button type="button" data-digit=".">.</button>
         <button class="equals" type="button" data-action="equals" aria-label="Equals">=</button>
       </div>
+      <section class="history" aria-labelledby="history-heading">
+        <div class="history-header">
+          <h2 id="history-heading">History</h2>
+          <button class="clear-history" id="clear-history" type="button">Clear</button>
+        </div>
+        <ol class="history-list" id="history-list" aria-live="polite"></ol>
+      </section>
     </main>
     <script type="module" src="./src/app.mjs"></script>
   </body>

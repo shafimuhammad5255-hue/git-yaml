@@ -21,6 +21,33 @@ export function calculate(left, operator, right) {
   return result;
 }
 
+export function appendDigit(currentInput, digit) {
+  if (!/^[0-9.]$/.test(digit)) throw new RangeError(`Unsupported digit: ${digit}`);
+  if (digit === "." && currentInput.includes(".")) return currentInput;
+
+  const nextInput = digit === "."
+    ? `${currentInput}.`
+    : currentInput === "0"
+      ? digit
+      : `${currentInput}${digit}`;
+
+  if (!Number.isFinite(Number(nextInput))) {
+    throw new RangeError("Number is outside the supported range");
+  }
+  return nextInput;
+}
+
+export function percentage(value) {
+  if (!Number.isFinite(value)) throw new TypeError("Calculator input must be a finite number");
+  return value / 100;
+}
+
+export function squareRoot(value) {
+  if (!Number.isFinite(value)) throw new TypeError("Calculator input must be a finite number");
+  if (value < 0) throw new RangeError("Cannot calculate the square root of a negative number");
+  return Math.sqrt(value);
+}
+
 export function formatResult(value) {
   if (!Number.isFinite(value)) throw new TypeError("Calculator result must be a finite number");
   return String(Number(value.toPrecision(12)));
