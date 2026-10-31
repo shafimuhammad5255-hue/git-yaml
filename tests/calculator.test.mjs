@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { calculate, formatResult, percentage, squareRoot } from "../src/calculator.mjs";
+import { appendDigit, calculate, formatResult, percentage, squareRoot } from "../src/calculator.mjs";
 
 test("adds positive and negative numbers", () => {
   assert.equal(calculate(12, "+", 8), 20);
@@ -19,9 +19,35 @@ test("divides numbers", () => {
   assert.equal(calculate(20, "/", 4), 5);
 });
 
+test("supports chained operations from left to right", () => {
+  const firstResult = calculate(12, "+", 8);
+  assert.equal(calculate(firstResult, "*", 2), 40);
+});
+
+test("appends digits and prevents duplicate decimal points", () => {
+  assert.equal(appendDigit("12", "3"), "123");
+  assert.equal(appendDigit("12.3", "."), "12.3");
+  assert.equal(appendDigit("0", "."), "0.");
+});
+
+test("rejects digit entry that exceeds the finite number range", () => {
+  let input = "9";
+  assert.throws(() => {
+    for (let index = 0; index < 400; index += 1) input = appendDigit(input, "9");
+  }, {
+    name: "RangeError",
+    message: "Number is outside the supported range",
+  });
+});
+
+test("rejects invalid digit input", () => {
+  assert.throws(() => appendDigit("12", "+"), RangeError);
+});
+
 test("converts values to percentages", () => {
   assert.equal(percentage(25), 0.25);
   assert.equal(percentage(-50), -0.5);
+  assert.equal(percentage(0), 0);
 });
 
 test("calculates square roots", () => {
@@ -60,4 +86,9 @@ test("rejects non-finite inputs and results", () => {
 test("formats floating-point results cleanly", () => {
   assert.equal(formatResult(0.1 + 0.2), "0.3");
   assert.equal(formatResult(100), "100");
+  assert.equal(formatResult(Number.MAX_VALUE), "1.79769313486e+308");
+});
+
+test("rejects non-finite values when formatting results", () => {
+  assert.throws(() => formatResult(Infinity), TypeError);
 });

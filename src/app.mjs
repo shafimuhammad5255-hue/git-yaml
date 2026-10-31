@@ -1,4 +1,4 @@
-import { calculate, formatResult, percentage, squareRoot } from "./calculator.mjs";
+import { appendDigit, calculate, formatResult, percentage, squareRoot } from "./calculator.mjs";
 
 const display = document.querySelector("#display");
 const keys = document.querySelector(".keys");
@@ -87,10 +87,19 @@ function enterDigit(digit) {
     if (selectedOperator === null) expressionText = "";
     currentInput = digit === "." ? "0." : digit;
     waitingForOperand = false;
-  } else if (digit === ".") {
-    if (!currentInput.includes(".")) currentInput += ".";
   } else {
-    currentInput = currentInput === "0" ? digit : currentInput + digit;
+    try {
+      currentInput = appendDigit(currentInput, digit);
+    } catch {
+      currentInput = "Error";
+      storedValue = null;
+      selectedOperator = null;
+      waitingForOperand = true;
+      hasError = true;
+      expressionText = "Number is too large";
+      render();
+      return;
+    }
   }
   updatePendingExpression();
   render();
@@ -208,7 +217,8 @@ function changeSign() {
   if (Number(currentInput) !== 0) {
     currentInput = currentInput.startsWith("-") ? currentInput.slice(1) : `-${currentInput}`;
     waitingForOperand = false;
-    updatePendingExpression();
+    if (selectedOperator === null) expressionText = "";
+    else updatePendingExpression();
     render();
   }
 }
