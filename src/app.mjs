@@ -1,8 +1,12 @@
-import { calculate, formatResult } from "./calculator.mjs";
+import { calculate, formatResult, percentage, squareRoot } from "./calculator.mjs";
 
 const display = document.querySelector("#display");
 const keys = document.querySelector(".keys");
 const operatorButtons = [...document.querySelectorAll("[data-operator]")];
+const historyList = document.querySelector("#history-list");
+const clearHistoryButton = document.querySelector("#clear-history");
+const history = [];
+const historyLimit = 10;
 let currentInput = "0";
 let storedValue = null;
 let selectedOperator = null;
@@ -14,6 +18,42 @@ function render() {
   for (const button of operatorButtons) {
     button.setAttribute("aria-pressed", String(button.dataset.operator === selectedOperator));
   }
+}
+
+function renderHistory() {
+  historyList.replaceChildren();
+  if (history.length === 0) {
+    const emptyMessage = document.createElement("li");
+    emptyMessage.className = "history-empty";
+    emptyMessage.textContent = "Your calculations will appear here";
+    historyList.append(emptyMessage);
+    return;
+  }
+
+  for (const entry of history) {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.className = "history-entry";
+    button.type = "button";
+    button.textContent = `${entry.expression} = ${entry.result}`;
+    button.setAttribute("aria-label", `Use result ${entry.result}`);
+    button.addEventListener("click", () => {
+      currentInput = entry.result;
+      storedValue = null;
+      selectedOperator = null;
+      waitingForOperand = false;
+      hasError = false;
+      render();
+    });
+    item.append(button);
+    historyList.append(item);
+  }
+}
+
+function addHistory(expression, result) {
+  history.unshift({ expression, result });
+  if (history.length > historyLimit) history.pop();
+  renderHistory();
 }
 
 function clear() {
@@ -65,11 +105,32 @@ function setOperator(operator) {
 
 function equals() {
   if (hasError || selectedOperator === null || waitingForOperand) return;
+  const expression = `${storedValue} ${selectedOperator} ${currentInput}`;
   try {
     currentInput = formatResult(calculate(storedValue, selectedOperator, Number(currentInput)));
+    addHistory(expression, currentInput);
     storedValue = null;
     selectedOperator = null;
     waitingForOperand = true;
+  } catch {
+    currentInput = "Error";
+    storedValue = null;
+    selectedOperator = null;
+    waitingForOperand = true;
+    hasError = true;
+  }
+  render();
+}
+
+function applyUnaryOperation(operation) {
+  if (hasError) return;
+  const originalInput = currentInput;
+  try {
+    const value = Number(currentInput);
+    const result = operation === "sqrt" ? squareRoot(value) : percentage(value);
+    currentInput = formatResult(result);
+    waitingForOperand = false;
+    addHistory(operation === "sqrt" ? `√(${originalInput})` : `${originalInput}%`, currentInput);
   } catch {
     currentInput = "Error";
     storedValue = null;
@@ -109,7 +170,16 @@ keys.addEventListener("click", (event) => {
   else if (button.dataset.action === "delete") deleteLastDigit();
   else if (button.dataset.action === "sign") changeSign();
   else if (button.dataset.action === "equals") equals();
+  else if (button.dataset.action === "percent") applyUnaryOperation("percent");
+  else if (button.dataset.action === "sqrt") applyUnaryOperation("sqrt");
 });
+
+clearHistoryButton.addEventListener("click", () => {
+  history.length = 0;
+  renderHistory();
+});
+
+renderHistory();
 
 document.addEventListener("keydown", (event) => {
   if (/^[0-9.]$/.test(event.key)) enterDigit(event.key);
